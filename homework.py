@@ -66,8 +66,10 @@ def check_response(response):
                 return homeworks
             else:
                 logging.error('homeworks вернул None')
+                raise TypeError
         else:
             logging.error('homeworks в ответе не найден')
+            raise AssertionError
     else:
         logging.error('Не верный тип данных')
         raise TypeError
