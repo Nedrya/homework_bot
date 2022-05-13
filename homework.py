@@ -31,7 +31,6 @@ def send_message(bot, message):
     """Отправляет сообщение в Telegram чат."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
-        print('Отправлено сообщение в Telegram')
         logging.INFO('Сообщение отправлено в Telegram')
     except Exception as error:
         logging.error(f'Ошибка "{error}" при отправке '
@@ -45,29 +44,30 @@ def get_api_answer(current_timestamp):
     response = requests.get(ENDPOINT, headers=HEADERS,
                             params=params)
     status = response.status_code
+    log_message = 'API не доступен, код: '
     if status == requests.codes.ok:
         try:
-            print(response.json())
             return response.json()
         except Exception as error:
-            logging.error(f'API не доступен, код: {status}')
+            logging.error(f'{log_message} {status}')
             raise error
     else:
-        logging.error(f'API не доступен, код: {status}')
-        raise(f'API не доступен, код: {status}')
+        logging.error(f'{log_message} {status}')
+        raise(f'{log_message} {status}')
 
 
 def check_response(response):
     """Проверяет ответ API на корректность."""
-    print(f'Начало responce {type(response)}')
     if type(response) == dict:
-        homeworks = response['homeworks']
-        if type(homeworks) == list:
-            print(homeworks)
-            return homeworks
+        if 'homeworks' in response:
+            homeworks = response['homeworks']
+            if type(homeworks) == list:
+
+                return homeworks
+            else:
+                logging.error('homeworks вернул None')
         else:
-            print('homeworks вернул None')
-            logging.error('homeworks вернул None')
+            logging.error('homeworks в ответе не найден')
     else:
         logging.error('Не верный тип данных')
         raise TypeError
@@ -93,7 +93,6 @@ def parse_status(homework):
 def check_tokens():
     """Проверяет доступность переменных окружения."""
     if PRACTICUM_TOKEN and TELEGRAM_TOKEN:
-        print('Проверка токенов - Успешно')
         return True
     else:
         logging.critical('Отсутствует одна из обязательных переменных')
@@ -117,8 +116,6 @@ def main():
                 send_message(bot, status)
             else:
                 logging.debug('Статус домашней работы не обновлен ревьюером')
-                print('Нет изменений статуса')
-            current_timestamp = int(time.time())
             time.sleep(RETRY_TIME)
 
         except Exception as error:
