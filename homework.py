@@ -108,7 +108,6 @@ def main():
 
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
-
     while True:
         try:
             api_answer = get_api_answer(current_timestamp)
@@ -118,6 +117,7 @@ def main():
                 send_message(bot, status)
             else:
                 logging.debug('Статус домашней работы не обновлен ревьюером')
+            current_timestamp = api_answer.get('current_date')
             time.sleep(RETRY_TIME)
 
         except Exception as error:
