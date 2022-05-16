@@ -41,19 +41,23 @@ def get_api_answer(current_timestamp):
     """Делает запрос к  эндпоинту API-сервиса."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
-    response = requests.get(ENDPOINT, headers=HEADERS,
-                            params=params)
-    status = response.status_code
-    log_message = 'API не доступен, код: '
-    if status == requests.codes.ok:
-        try:
-            return response.json()
-        except Exception as error:
+    try:
+        response = requests.get(ENDPOINT, headers=HEADERS,
+                                params=params)
+        status = response.status_code
+        log_message = 'API не доступен, код: '
+        if status == requests.codes.ok:
+            try:
+                return response.json()
+            except Exception as error:
+                logging.error(f'{log_message} {status}')
+                raise error
+        else:
             logging.error(f'{log_message} {status}')
-            raise error
-    else:
-        logging.error(f'{log_message} {status}')
-        raise(f'{log_message} {status}')
+            raise(f'{log_message} {status}')
+    except Exception as error:
+        logging.error(f'Ошибка "{error}" при запросе '
+                      )
 
 
 def check_response(response):
@@ -77,7 +81,7 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлекает из информации домашней работе статус этой работы."""
-    homework_name = homework['homework_name']
+    homework_name = homework['homework_name'] 
     homework_status = homework['status']
     try:
         verdict = HOMEWORK_STATUSES[homework_status]
