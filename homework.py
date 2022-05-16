@@ -58,6 +58,7 @@ def get_api_answer(current_timestamp):
     except Exception as error:
         logging.error(f'Ошибка "{error}" при запросе '
                       )
+        raise error
 
 
 def check_response(response):
@@ -81,7 +82,7 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлекает из информации домашней работе статус этой работы."""
-    homework_name = homework['homework_name'] 
+    homework_name = homework['homework_name']
     homework_status = homework['status']
     try:
         verdict = HOMEWORK_STATUSES[homework_status]
