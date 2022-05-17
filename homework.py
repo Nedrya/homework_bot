@@ -10,7 +10,7 @@ import time
 load_dotenv()
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-TELEGRAM_CHAT_ID = 995425006
+TELEGRAM_CHAT_ID = 5288413281
 
 RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
@@ -42,23 +42,22 @@ def get_api_answer(current_timestamp):
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
+
         response = requests.get(ENDPOINT, headers=HEADERS,
                                 params=params)
-        status = response.status_code
-        log_message = 'API не доступен, код: '
-        if status == requests.codes.ok:
-            try:
-                return response.json()
-            except Exception as error:
-                logging.error(f'{log_message} {status}')
-                raise error
-        else:
-            logging.error(f'{log_message} {status}')
-            raise(f'{log_message} {status}')
     except Exception as error:
-        logging.error(f'Ошибка "{error}" при запросе '
-                      )
-        raise error
+        logging.error(f'ошибка:{error}')
+    status = response.status_code
+    log_message = 'API не доступен, код: '
+    if status == requests.codes.ok:
+        try:
+            return response.json()
+        except Exception as error:
+            logging.error(f'{log_message} {status}')
+            raise error
+    else:
+        logging.error(f'{log_message} {status}')
+        raise(f'{log_message} {status}')
 
 
 def check_response(response):
@@ -86,7 +85,6 @@ def parse_status(homework):
     homework_status = homework['status']
     try:
         verdict = HOMEWORK_STATUSES[homework_status]
-        print('Статус - {verdict}')
         return f'Изменился статус проверки работы "{homework_name}". {verdict}'
     except KeyError:
         logging.error(f'Статус домашней работы "{homework_status}" '

@@ -152,4 +152,6 @@ media/
 
 # Пароли и токены
 .evn
+/nedrya
+nedrya/
 
